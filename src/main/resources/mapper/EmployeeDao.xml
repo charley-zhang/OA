@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.homework.dao.EmployeeDao">
+
+    <resultMap type="com.homework.entity.Employee" id="EmployeeMap">
+        <result property="emId" column="em_id" jdbcType="INTEGER"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="loginName" column="login_name" jdbcType="VARCHAR"/>
+        <result property="depId" column="dep_id" jdbcType="INTEGER"/>
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="EmployeeInfo">
+        select
+          em_id, password, name, login_name, dep_id, position_id, status
+        from mysql_ssm.employee
+        where em_id = #{emId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="EmployeeMap">
+        select
+          em_id, password, name, login_name, dep_id, position_id, status
+        from mysql_ssm.employee
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="EmployeeMap">
+        select
+        em_id, password, name, login_name, dep_id, position_id, status
+        from mysql_ssm.employee
+        <where>
+            <if test="emId != null">
+                and em_id = #{emId}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="loginName != null and loginName != ''">
+                and login_name = #{loginName}
+            </if>
+            <if test="depId != null">
+                and dep_id = #{depId}
+            </if>
+            <if test="positionId != null">
+                and position_id = #{positionId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="emId" useGeneratedKeys="true">
+        insert into mysql_ssm.employee(password, name, login_name, dep_id, position_id, status)
+        values (#{password}, #{name}, #{loginName}, #{depId}, #{positionId}, #{status})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="emId" useGeneratedKeys="true">
+        insert into mysql_ssm.employee(password, name, login_name, dep_id, position_id, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.password}, #{entity.name}, #{entity.loginName}, #{entity.depId}, #{entity.positionId},
+            #{entity.status})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="emId" useGeneratedKeys="true">
+        insert into mysql_ssm.employee(password, name, login_name, dep_id, position_id, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.password}, #{entity.name}, #{entity.loginName}, #{entity.depId}, #{entity.positionId},
+            #{entity.status})
+        </foreach>
+        on duplicate key update
+        password = values(password) , name = values(name) , login_name = values(login_name) , dep_id = values(dep_id) ,
+        position_id = values(position_id) , status = values(status)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update mysql_ssm.employee
+        <set>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="loginName != null and loginName != ''">
+                login_name = #{loginName},
+            </if>
+            <if test="depId != null">
+                dep_id = #{depId},
+            </if>
+            <if test="positionId != null">
+                position_id = #{positionId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where em_id = #{emId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from mysql_ssm.employee where em_id = #{emId}
+    </delete>
+
+    <!--**********************************-->
+
+    <resultMap type="com.homework.dto.EmployeeDTO" id="EmployeeInfo">
+        <result property="emId" column="em_id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="loginName" column="login_name" jdbcType="VARCHAR"/>
+        <result property="depId" column="dep_id" jdbcType="INTEGER"/>
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <association property="department" column="dep_id" select="com.homework.dao.DepartmentDao.queryById" />
+        <association property="position" column="position_id" select="com.homework.dao.PositionDao.queryById" />
+    </resultMap>
+
+    <select id="queryEmIfnoByUsernameAndPassword" resultMap="EmployeeInfo">
+        select
+          em_id, name, login_name, dep_id, position_id, status
+        from mysql_ssm.employee
+        where login_name = #{username} And password = #{password} AND status = 1
+        </select>
+
+
+    <select id="queryPageList" resultMap="EmployeeInfo">
+        select
+        em_id, password, name, login_name, dep_id, position_id, status
+        from mysql_ssm.employee
+        <where>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="loginName != null and loginName != ''">
+                and login_name LIKE concat('%',#{loginName},'%')
+            </if>
+            <if test="depId != null">
+                and dep_id = #{depId}
+            </if>
+            <if test="positionId != null">
+                and position_id = #{positionId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <update id="updataFailureStatusById">
+        UPDATE mysql_ssm.employee
+        SET status=0
+        WHERE em_id = #{emId}
+    </update>
+    <update id="updataSuccessStatusById">
+        UPDATE mysql_ssm.employee
+        SET status=1
+        WHERE em_id = #{emId}
+    </update>
+
+
+</mapper>
+

@@ -1,0 +1,40 @@
+{
+  "name" : "Position",
+  "preName" : "",
+  "comment" : "职位表",
+  "templateGroupName" : "Default",
+  "fullColumn" : [ {
+    "name" : "positionId",
+    "comment" : null,
+    "type" : null,
+    "shortType" : null,
+    "custom" : false,
+    "ext" : { }
+  }, {
+    "name" : "positionName",
+    "comment" : null,
+    "type" : null,
+    "shortType" : null,
+    "custom" : false,
+    "ext" : { }
+  }, {
+    "name" : "createTime",
+    "comment" : null,
+    "type" : null,
+    "shortType" : null,
+    "custom" : false,
+    "ext" : { }
+  }, {
+    "name" : "status",
+    "comment" : null,
+    "type" : null,
+    "shortType" : null,
+    "custom" : false,
+    "ext" : { }
+  } ],
+  "pkColumn" : null,
+  "otherColumn" : null,
+  "savePackageName" : "com.homework",
+  "savePath" : "./src/main/java/com/homework",
+  "saveModelName" : "homework-SSM_20210508after"
+}

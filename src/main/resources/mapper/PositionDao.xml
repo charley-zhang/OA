@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.homework.dao.PositionDao">
+
+    <resultMap type="com.homework.entity.Position" id="PositionMap">
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <result property="positionName" column="position_name" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PositionMap">
+        select
+          position_id, position_name, create_time, status
+        from mysql_ssm.position
+        where position_id = #{positionId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PositionMap">
+        select
+          position_id, position_name, create_time, status
+        from mysql_ssm.position
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="PositionMap">
+        select
+        position_id, position_name, create_time, status
+        from mysql_ssm.position
+        <where>
+            <if test="positionId != null">
+                and position_id = #{positionId}
+            </if>
+            <if test="positionName != null and positionName != ''">
+                and position_name = #{positionName}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="positionId" useGeneratedKeys="true">
+        insert into mysql_ssm.position(position_name, create_time, status)
+        values (#{positionName}, #{createTime}, #{status})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="positionId" useGeneratedKeys="true">
+        insert into mysql_ssm.position(position_name, create_time, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.positionName}, #{entity.createTime}, #{entity.status})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="positionId" useGeneratedKeys="true">
+        insert into mysql_ssm.position(position_name, create_time, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.positionName}, #{entity.createTime}, #{entity.status})
+        </foreach>
+        on duplicate key update
+        position_name = values(position_name) , create_time = values(create_time) , status = values(status)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update mysql_ssm.position
+        <set>
+            <if test="positionName != null and positionName != ''">
+                position_name = #{positionName},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where position_id = #{positionId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from mysql_ssm.position where position_id = #{positionId}
+    </delete>
+
+    <!--  ************************************************  -->
+    <update id="updataFailureStatusById">
+        UPDATE mysql_ssm.position
+        SET status=0
+        WHERE position_id = #{positionId}
+    </update>
+    <update id="updataSuccessStatusById">
+        UPDATE mysql_ssm.position
+        SET status=1
+        WHERE position_id = #{positionId}
+    </update>
+
+    <!--  查询部门列表  -->
+    <select id="queryPageList" resultType="com.homework.dto.responseDTO.PositionListResponseDTO">
+        select
+        position_id, position_name,create_time,status
+        from mysql_ssm.position
+        <where>
+            <if test="positionName != null and positionName!=''">
+                and position_name LIKE concat('%',#{positionName},'%')
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="queryActiveList" resultType="com.homework.dto.responseDTO.PositionActiveListResponseDTO">
+        SELECT position_id, position_name
+        FROM position
+        WHERE status = 1
+    </select>
+
+
+</mapper>
+
